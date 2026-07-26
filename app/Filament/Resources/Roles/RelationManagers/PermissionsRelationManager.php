@@ -42,19 +42,6 @@ class PermissionsRelationManager extends RelationManager
                 TextColumn::make('group')
                     ->label('Grupo')
                     ->badge()
-                    ->colors([
-                        'blue' => 'Usuários',
-                        'purple' => 'Permissões',
-                        'indigo' => 'Perfis',
-                        'green' => 'Alunos',
-                        'cyan' => 'Divisões de Treino',
-                        'teal' => 'Exercícios',
-                        'emerald' => 'Planos de Refeição',
-                        'lime' => 'Avaliações',
-                        'yellow' => 'Reservas',
-                        'orange' => 'Despesas',
-                        'red' => 'Vendas',
-                    ])
                     ->sortable(),
 
                 TextColumn::make('description')
@@ -68,6 +55,7 @@ class PermissionsRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('id', 'desc')
             ->recordActions([
                 DeleteAction::make(),
             ])

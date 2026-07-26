@@ -3,10 +3,13 @@
 namespace App\Filament\Resources\Users\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -67,6 +70,7 @@ class UsersTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('id', 'desc')
             ->filters([
                 SelectFilter::make('status')
                     ->label('Status')
@@ -77,10 +81,24 @@ class UsersTable
                 SelectFilter::make('role')
                     ->label('Perfil')
                     ->relationship('role', 'name'),
+
+                Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('date_from')
+                            ->label('Criação (De)'),
+                        DatePicker::make('date_until')
+                            ->label('Criação (Até)'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when($data['date_from'], fn ($q) => $q->where('created_at', '>=', $data['date_from']))
+                            ->when($data['date_until'], fn ($q) => $q->where('created_at', '<=', $data['date_until']));
+                    }),
             ])
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

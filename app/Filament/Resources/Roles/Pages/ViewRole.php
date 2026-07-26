@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Roles\Pages;
 
 use App\Filament\Resources\Roles\RoleResource;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
@@ -17,6 +18,7 @@ class ViewRole extends ViewRecord
     {
         return [
             EditAction::make(),
+            DeleteAction::make(),
         ];
     }
 
@@ -33,20 +35,17 @@ class ViewRole extends ViewRecord
 
                         TextEntry::make('description')
                             ->label('Descrição')
-                            ->placeholder('-')
-                            ->columnSpanFull(),
+                            ->placeholder('-'),
 
                         TextEntry::make('created_at')
                             ->label('Criado em')
                             ->dateTime('d/m/Y H:i')
-                            ->placeholder('-')
-                            ->columnSpanFull(),
+                            ->placeholder('-'),
 
                         TextEntry::make('updated_at')
                             ->label('Atualizado em')
                             ->dateTime('d/m/Y H:i')
-                            ->placeholder('-')
-                            ->columnSpanFull(),
+                            ->placeholder('-'),
                     ]),
             ]);
     }

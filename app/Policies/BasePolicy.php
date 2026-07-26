@@ -11,6 +11,10 @@ abstract class BasePolicy
 
     protected function hasPermission(User $user, string $action): bool
     {
+        if ($user->is_super_admin) {
+            return true;
+        }
+
         return $user->role?->permissions()
             ->where('code', "{$this->resourceCode()}.{$action}")
             ->exists() ?? false;

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
@@ -36,6 +37,12 @@ class BaseModel extends Model
             $message = "Lazy load [{$relation}] on model [".get_class($model).'].';
             info($message);
             throw new \Exception($message);
+        });
+
+        static::creating(function (self $model): void {
+            if (in_array('uuid', $model->getFillable()) && empty($model->uuid)) {
+                $model->uuid = Str::uuid();
+            }
         });
     }
 }

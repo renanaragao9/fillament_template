@@ -24,15 +24,16 @@ class RoleForm
 
             $permissionSections[] = Section::make($groupName)
                 ->collapsible()
-                ->collapsed()
+                ->collapsed(false)
                 ->compact()
                 ->schema([
-                    Toggle::make('select_all_' . $groupKey)
+                    Toggle::make('select_all_'.$groupKey)
                         ->label('Selecionar todos')
                         ->live()
                         ->afterStateHydrated(function ($component, $record) use ($permissions) {
-                            if (!$record) {
+                            if (! $record) {
                                 $component->state(false);
+
                                 return;
                             }
                             $rolePermissionIds = $record->permissions->pluck('id')->toArray();
@@ -42,17 +43,18 @@ class RoleForm
                         })
                         ->afterStateUpdated(function ($state, $set) use ($permissions, $groupKey) {
                             $ids = $state ? $permissions->pluck('id')->toArray() : [];
-                            $set('group_' . $groupKey, $ids);
+                            $set('group_'.$groupKey, $ids);
                         }),
 
-                    CheckboxList::make('group_' . $groupKey)
+                    CheckboxList::make('group_'.$groupKey)
                         ->label('Permissões')
                         ->options($permissions->pluck('name', 'id'))
                         ->columns(2)
                         ->live()
                         ->afterStateHydrated(function ($component, $record) use ($permissions) {
-                            if (!$record) {
+                            if (! $record) {
                                 $component->state([]);
+
                                 return;
                             }
                             $rolePermissionIds = $record->permissions->pluck('id')->toArray();
@@ -62,7 +64,7 @@ class RoleForm
                         })
                         ->afterStateUpdated(function ($state, $set) use ($permissions, $groupKey) {
                             $allIds = $permissions->pluck('id')->toArray();
-                            $set('select_all_' . $groupKey, count(array_intersect($state ?? [], $allIds)) === count($allIds));
+                            $set('select_all_'.$groupKey, count(array_intersect($state ?? [], $allIds)) === count($allIds));
                         }),
                 ]);
         }
@@ -83,7 +85,7 @@ class RoleForm
                     ->description('Selecione os grupos ou permissões individuais para este perfil.')
                     ->schema($permissionSections)
                     ->collapsible()
-                    ->collapsed(),
+                    ->collapsed(false),
             ]);
     }
 }
