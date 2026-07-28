@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Roles\Tables;
 
+use App\Filament\Filters\Common\CreatedAtFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -37,7 +38,7 @@ class RolesTable
             ])
             ->defaultSort('id', 'desc')
             ->filters([
-                //
+                CreatedAtFilter::make(),
             ])
             ->recordActions([
                 ViewAction::make(),

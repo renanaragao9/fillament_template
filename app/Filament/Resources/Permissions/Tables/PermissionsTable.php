@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Permissions\Tables;
 
+use App\Filament\Filters\Common\CreatedAtFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ViewAction;
@@ -35,7 +36,7 @@ class PermissionsTable
             ])
             ->defaultSort('id', 'desc')
             ->filters([
-                //
+                CreatedAtFilter::make(),
             ])
             ->recordActions([
                 ViewAction::make(),

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Companies\Tables;
 
+use App\Filament\Filters\Common\CreatedAtFilter;
+use App\Filament\Filters\Company\StatusFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -9,7 +11,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class CompaniesTable
@@ -81,13 +82,8 @@ class CompaniesTable
             ])
             ->defaultSort('id', 'desc')
             ->filters([
-                SelectFilter::make('status')
-                    ->label('Status')
-                    ->options([
-                        'active' => 'Ativo',
-                        'inactive' => 'Inativo',
-                        'suspended' => 'Suspenso',
-                    ]),
+                StatusFilter::make(),
+                CreatedAtFilter::make(),
             ])
             ->recordActions([
                 ViewAction::make(),

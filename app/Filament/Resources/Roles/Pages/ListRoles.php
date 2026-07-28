@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Roles\Pages;
 use App\Filament\Resources\Roles\RoleResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Icons\Heroicon;
 
 class ListRoles extends ListRecords
 {
@@ -13,7 +14,8 @@ class ListRoles extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->icon(Heroicon::OutlinedPlus),
         ];
     }
 }

@@ -2,15 +2,15 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Filament\Filters\Common\CreatedAtFilter;
+use App\Filament\Filters\User\RoleFilter;
+use App\Filament\Filters\User\StatusFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class UsersTable
@@ -72,28 +72,9 @@ class UsersTable
             ])
             ->defaultSort('id', 'desc')
             ->filters([
-                SelectFilter::make('status')
-                    ->label('Status')
-                    ->options([
-                        'active' => 'Ativo',
-                        'inactive' => 'Inativo',
-                    ]),
-                SelectFilter::make('role')
-                    ->label('Perfil')
-                    ->relationship('role', 'name'),
-
-                Filter::make('created_at')
-                    ->form([
-                        DatePicker::make('date_from')
-                            ->label('Criação (De)'),
-                        DatePicker::make('date_until')
-                            ->label('Criação (Até)'),
-                    ])
-                    ->query(function ($query, array $data) {
-                        return $query
-                            ->when($data['date_from'], fn ($q) => $q->where('created_at', '>=', $data['date_from']))
-                            ->when($data['date_until'], fn ($q) => $q->where('created_at', '<=', $data['date_until']));
-                    }),
+                StatusFilter::make(),
+                RoleFilter::make(),
+                CreatedAtFilter::make(),
             ])
             ->recordActions([
                 ViewAction::make(),
