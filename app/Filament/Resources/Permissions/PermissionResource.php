@@ -21,6 +21,8 @@ class PermissionResource extends BaseResource
 {
     protected static ?string $model = Permission::class;
 
+    protected static ?string $recordTitleAttribute = 'name';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedKey;
 
     protected static ?string $modelLabel = 'Permissão';

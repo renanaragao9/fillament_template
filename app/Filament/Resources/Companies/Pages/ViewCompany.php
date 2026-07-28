@@ -6,6 +6,7 @@ use App\Filament\Resources\Companies\CompanyResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Icons\Heroicon;
 
 class ViewCompany extends ViewRecord
 {
@@ -14,8 +15,10 @@ class ViewCompany extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make(),
-            DeleteAction::make(),
+            EditAction::make()
+                ->icon(Heroicon::OutlinedPencil),
+            DeleteAction::make()
+                ->icon(Heroicon::OutlinedTrash),
         ];
     }
 }

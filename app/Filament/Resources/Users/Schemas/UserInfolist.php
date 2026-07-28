@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -18,6 +19,11 @@ class UserInfolist
                     ->collapsible()
                     ->collapsed(false)
                     ->schema([
+                        ImageEntry::make('image_path')
+                            ->label('Avatar')
+                            ->circular()
+                            ->columnSpanFull(),
+
                         TextEntry::make('name')
                             ->label('Nome'),
 

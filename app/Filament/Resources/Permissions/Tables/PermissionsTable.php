@@ -6,6 +6,7 @@ use App\Filament\Filters\Common\CreatedAtFilter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -39,7 +40,8 @@ class PermissionsTable
                 CreatedAtFilter::make(),
             ])
             ->recordActions([
-                ViewAction::make(),
+                ViewAction::make()
+                    ->icon(Heroicon::OutlinedEye),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

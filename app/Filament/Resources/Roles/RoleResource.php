@@ -22,6 +22,8 @@ class RoleResource extends BaseResource
 {
     protected static ?string $model = Role::class;
 
+    protected static ?string $recordTitleAttribute = 'name';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShieldCheck;
 
     protected static ?string $modelLabel = 'Perfil';

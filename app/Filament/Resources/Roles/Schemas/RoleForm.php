@@ -72,14 +72,19 @@ class RoleForm
         return $schema
             ->columns(1)
             ->components([
-                TextInput::make('name')
-                    ->label('Nome')
-                    ->required(),
+                Section::make('Dados do Perfil')
+                    ->columnSpanFull()
+                    ->columns(1)
+                    ->schema([
+                        TextInput::make('name')
+                            ->label('Nome')
+                            ->required(),
 
-                Textarea::make('description')
-                    ->label('Descrição')
-                    ->rows(3)
-                    ->nullable(),
+                        Textarea::make('description')
+                            ->label('Descrição')
+                            ->rows(3)
+                            ->nullable(),
+                    ]),
 
                 Section::make('Permissões por Grupo')
                     ->description('Selecione os grupos ou permissões individuais para este perfil.')

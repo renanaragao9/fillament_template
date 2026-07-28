@@ -9,6 +9,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -86,9 +87,12 @@ class CompaniesTable
                 CreatedAtFilter::make(),
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                ViewAction::make()
+                    ->icon(Heroicon::OutlinedEye),
+                EditAction::make()
+                    ->icon(Heroicon::OutlinedPencil),
+                DeleteAction::make()
+                    ->icon(Heroicon::OutlinedTrash),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

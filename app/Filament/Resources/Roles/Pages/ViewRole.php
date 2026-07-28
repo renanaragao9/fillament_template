@@ -9,6 +9,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class ViewRole extends ViewRecord
 {
@@ -17,8 +18,10 @@ class ViewRole extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            EditAction::make(),
-            DeleteAction::make(),
+            EditAction::make()
+                ->icon(Heroicon::OutlinedPencil),
+            DeleteAction::make()
+                ->icon(Heroicon::OutlinedTrash),
         ];
     }
 

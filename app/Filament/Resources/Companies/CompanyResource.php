@@ -21,6 +21,8 @@ class CompanyResource extends BaseResource
 {
     protected static ?string $model = Company::class;
 
+    protected static ?string $recordTitleAttribute = 'name';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
 
     protected static ?string $modelLabel = 'Empresa';

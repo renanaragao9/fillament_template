@@ -21,6 +21,8 @@ class UserResource extends BaseResource
 {
     protected static ?string $model = User::class;
 
+    protected static ?string $recordTitleAttribute = 'name';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
     protected static ?string $modelLabel = 'Usuário';
