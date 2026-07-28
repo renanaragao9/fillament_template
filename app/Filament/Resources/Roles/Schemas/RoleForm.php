@@ -2,14 +2,19 @@
 
 namespace App\Filament\Resources\Roles\Schemas;
 
+use App\Models\Company;
 use App\Models\Permission;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Unique;
 
 class RoleForm
 {
@@ -76,9 +81,24 @@ class RoleForm
                     ->columnSpanFull()
                     ->columns(1)
                     ->schema([
+                        Select::make('company_id')
+                            ->label('Empresa')
+                            ->options(fn () => Company::query()->orderBy('name')->pluck('name', 'id'))
+                            ->searchable()
+                            ->required()
+                            ->live()
+                            ->visible(fn () => (bool) Auth::user()?->is_super_admin),
+
                         TextInput::make('name')
                             ->label('Nome')
-                            ->required(),
+                            ->required()
+                            ->unique(
+                                ignoreRecord: true,
+                                modifyRuleUsing: fn (Unique $rule, Get $get) => $rule->where(
+                                    'company_id',
+                                    $get('company_id') ?: Auth::user()?->company_id
+                                ),
+                            ),
 
                         Textarea::make('description')
                             ->label('Descrição')

@@ -31,6 +31,8 @@ return new class extends Migration
             $table->index('email');
             $table->index('status');
             $table->index('deleted_at');
+            $table->index(['company_id', 'status']);
+            $table->index(['company_id', 'deleted_at']);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

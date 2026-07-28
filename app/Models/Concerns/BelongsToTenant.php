@@ -2,15 +2,16 @@
 
 namespace App\Models\Concerns;
 
+use App\Models\Company;
 use App\Models\Scopes\TenantScope;
+use App\Support\TenantContext;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @mixin Model
  *
  * @property int|null $company_id
- * @property bool $is_super_admin
  *
  * @method static void addGlobalScope(mixed $scope, mixed $implementation = null)
  * @method static void saving(callable $callback)
@@ -22,15 +23,10 @@ trait BelongsToTenant
         static::addGlobalScope(new TenantScope);
 
         static::saving(function (Model $model): void {
-            if (! Auth::hasUser()) {
-                return;
-            }
+            $tenant = TenantContext::current();
 
-            $user = Auth::user();
-
-            if ($user && ! $user->is_super_admin) {
-                $model->company_id = $user->company_id;
-                $model->is_super_admin = false;
+            if ($tenant->shouldScope()) {
+                $model->company_id = $tenant->companyId();
             }
         });
     }
@@ -38,5 +34,10 @@ trait BelongsToTenant
     public function tenantScopeIncludesGlobalRecords(): bool
     {
         return false;
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Models;
 
-use App\Models\Company;
 use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -11,60 +11,39 @@ class PermissionTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected Company $company;
-
-    protected function setUp(): void
+    protected function permission(array $attributes = []): Permission
     {
-        parent::setUp();
-
-        $this->company = Company::create([
-            'name' => 'Seuracha Store',
-            'slug' => 'seuracha-store',
-            'status' => 'active',
-        ]);
+        return Permission::create(array_merge([
+            'name' => 'Ver Usuários',
+            'code' => 'user.view',
+            'group' => 'Usuários',
+        ], $attributes));
     }
 
     public function test_can_create_permission(): void
     {
-        $permission = Permission::create([
-            'name' => 'Ver Usuários',
-            'code' => 'user.view',
-            'group' => 'Usuários',
-            'company_id' => $this->company->id,
-        ]);
+        $permission = $this->permission();
 
         $this->assertDatabaseHas('permissions', [
             'id' => $permission->id,
             'code' => 'user.view',
-            'company_id' => $this->company->id,
         ]);
     }
 
     public function test_can_read_permission(): void
     {
-        $permission = Permission::create([
-            'name' => 'Ver Usuários',
-            'code' => 'user.view',
-            'group' => 'Usuários',
-            'company_id' => $this->company->id,
-        ]);
+        $permission = $this->permission();
 
         $found = Permission::find($permission->id);
 
         $this->assertNotNull($found);
         $this->assertSame('user.view', $found->code);
         $this->assertSame('Usuários', $found->group);
-        $this->assertSame($this->company->id, $found->company_id);
     }
 
     public function test_can_update_permission(): void
     {
-        $permission = Permission::create([
-            'name' => 'Ver Usuários',
-            'code' => 'user.view',
-            'group' => 'Usuários',
-            'company_id' => $this->company->id,
-        ]);
+        $permission = $this->permission();
 
         $permission->update(['name' => 'Visualizar Usuários']);
 
@@ -76,42 +55,31 @@ class PermissionTest extends TestCase
 
     public function test_can_delete_permission(): void
     {
-        $permission = Permission::create([
-            'name' => 'Ver Usuários',
-            'code' => 'user.view',
-            'group' => 'Usuários',
-            'company_id' => $this->company->id,
-        ]);
+        $permission = $this->permission();
 
         $permission->delete();
 
-        $this->assertSoftDeleted('permissions', [
-            'id' => $permission->id,
-        ]);
+        $this->assertSoftDeleted('permissions', ['id' => $permission->id]);
         $this->assertNull(Permission::find($permission->id));
     }
 
-    public function test_permission_belongs_to_company(): void
+    public function test_permission_is_a_global_catalog_without_company(): void
     {
-        $permission = Permission::create([
-            'name' => 'Ver Usuários',
-            'code' => 'user.view',
-            'group' => 'Usuários',
-            'company_id' => $this->company->id,
-        ]);
+        $permission = $this->permission();
 
-        $this->assertTrue($permission->company->is($this->company));
+        $this->assertFalse(
+            array_key_exists('company_id', $permission->getAttributes()),
+            'Permissão é catálogo global e não deve ter company_id.'
+        );
     }
 
-    public function test_permission_can_be_global_without_company(): void
+    public function test_permission_belongs_to_many_roles(): void
     {
-        $permission = Permission::create([
-            'name' => 'Ver Usuários',
-            'code' => 'user.view',
-            'group' => 'Usuários',
-        ]);
+        $permission = $this->permission();
+        $role = Role::create(['name' => 'Admin']);
 
-        $this->assertNull($permission->company_id);
-        $this->assertNull($permission->company);
+        $role->permissions()->sync([$permission->id]);
+
+        $this->assertTrue($permission->roles()->whereKey($role->id)->exists());
     }
 }

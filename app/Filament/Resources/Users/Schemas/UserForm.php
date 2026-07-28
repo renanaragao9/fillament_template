@@ -2,13 +2,16 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Models\Company;
 use App\Models\Role;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Auth;
 
 class UserForm
 {
@@ -24,7 +27,7 @@ class UserForm
                         FileUpload::make('image_path')
                             ->label('Avatar')
                             ->image()
-                            ->directory('avatars')
+                            ->directory(fn (Get $get) => 'avatars/'.static::tenantFolder($get))
                             ->columnSpanFull(),
 
                         TextInput::make('name')
@@ -49,9 +52,20 @@ class UserForm
                             ])
                             ->nullable(),
 
+                        Select::make('company_id')
+                            ->label('Empresa')
+                            ->options(fn () => Company::query()->orderBy('name')->pluck('name', 'id'))
+                            ->searchable()
+                            ->required()
+                            ->live()
+                            ->visible(fn () => (bool) Auth::user()?->is_super_admin),
+
                         Select::make('role_id')
                             ->label('Perfil')
-                            ->options(Role::pluck('name', 'id'))
+                            ->options(fn (Get $get) => Role::query()
+                                ->where('company_id', $get('company_id') ?: Auth::user()?->company_id)
+                                ->orderBy('name')
+                                ->pluck('name', 'id'))
                             ->searchable()
                             ->nullable(),
 
@@ -67,5 +81,10 @@ class UserForm
                             ->columnSpanFull(),
                     ]),
             ]);
+    }
+
+    protected static function tenantFolder(Get $get): string
+    {
+        return (string) ($get('company_id') ?: Auth::user()?->company_id ?: 'system');
     }
 }

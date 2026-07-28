@@ -14,6 +14,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class UsersTable
 {
@@ -54,6 +55,11 @@ class UsersTable
                     ->label('Perfil')
                     ->sortable()
                     ->placeholder('-'),
+                TextColumn::make('company.name')
+                    ->label('Empresa')
+                    ->sortable()
+                    ->placeholder('Sem empresa')
+                    ->visible(fn () => (bool) Auth::user()?->is_super_admin),
                 TextColumn::make('last_login_at')
                     ->label('Último acesso')
                     ->dateTime('d/m/Y H:i')

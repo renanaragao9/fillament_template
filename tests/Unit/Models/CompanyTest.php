@@ -3,10 +3,11 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Company;
-use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class CompanyTest extends TestCase
@@ -84,7 +85,7 @@ class CompanyTest extends TestCase
             'status' => 'active',
         ]);
 
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
 
         Company::create([
             'name' => 'Outra Empresa',
@@ -117,7 +118,7 @@ class CompanyTest extends TestCase
             'trial_ends_at' => '2026-08-01 00:00:00',
         ]);
 
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $company->trial_ends_at);
+        $this->assertInstanceOf(Carbon::class, $company->trial_ends_at);
     }
 
     public function test_company_has_many_users(): void
@@ -155,7 +156,7 @@ class CompanyTest extends TestCase
         $this->assertTrue($company->roles()->whereKey($role->id)->exists());
     }
 
-    public function test_company_has_many_permissions(): void
+    public function test_is_active_requires_active_status_and_valid_trial(): void
     {
         $company = Company::create([
             'name' => 'Seuracha Store',
@@ -163,13 +164,15 @@ class CompanyTest extends TestCase
             'status' => 'active',
         ]);
 
-        $permission = Permission::create([
-            'name' => 'Ver Usuários',
-            'code' => 'user.view',
-            'group' => 'Usuários',
-            'company_id' => $company->id,
-        ]);
+        $this->assertTrue($company->isActive());
 
-        $this->assertTrue($company->permissions()->whereKey($permission->id)->exists());
+        $company->update(['trial_ends_at' => now()->addDay()]);
+        $this->assertTrue($company->fresh()->isActive());
+
+        $company->update(['trial_ends_at' => now()->subDay()]);
+        $this->assertFalse($company->fresh()->isActive());
+
+        $company->update(['trial_ends_at' => null, 'status' => 'inactive']);
+        $this->assertFalse($company->fresh()->isActive());
     }
 }

@@ -10,15 +10,15 @@ use App\Policies\CompanyPolicy;
 use App\Policies\PermissionPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\UserPolicy;
+use App\Support\TenantContext;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
+use Spatie\Activitylog\Models\Activity;
 
 class AppServiceProvider extends AuthServiceProvider
 {
     /**
-     * The model to policy mappings for the application.
-     *
      * @var array<class-string, class-string>
      */
     protected $policies = [
@@ -28,17 +28,11 @@ class AppServiceProvider extends AuthServiceProvider
         User::class => UserPolicy::class,
     ];
 
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        //
+        $this->app->scoped(TenantContext::class);
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         if (app()->environment('production')) {
@@ -46,6 +40,10 @@ class AppServiceProvider extends AuthServiceProvider
         }
 
         $this->registerPolicies();
+
+        Activity::creating(function (Activity $activity): void {
+            $activity->company_id ??= TenantContext::current()->companyId();
+        });
 
         Gate::define('viewApiDocs', function (?User $user): bool {
             return (bool) $user?->is_super_admin;

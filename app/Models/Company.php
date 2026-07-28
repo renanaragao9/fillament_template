@@ -45,8 +45,12 @@ class Company extends BaseModel
         return $this->hasMany(Role::class);
     }
 
-    public function permissions(): HasMany
+    public function isActive(): bool
     {
-        return $this->hasMany(Permission::class);
+        if ($this->status !== 'active') {
+            return false;
+        }
+
+        return $this->trial_ends_at === null || $this->trial_ends_at->isFuture();
     }
 }

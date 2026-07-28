@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Roles\Traits;
 
+use App\Models\Permission;
+
 trait HandlesRolePermissions
 {
     protected function savePermissions(): void
@@ -15,6 +17,8 @@ trait HandlesRolePermissions
             }
         }
 
-        $this->record->permissions()->sync($permissionIds);
+        $this->record->permissions()->sync(
+            Permission::whereIn('id', $permissionIds)->pluck('id')
+        );
     }
 }

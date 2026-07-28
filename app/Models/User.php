@@ -3,12 +3,11 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToTenant;
+use App\Models\Concerns\IsSystemRecord;
 use App\Models\Traits\HasFileUploads;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -17,14 +16,30 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'phone', 'image_path', 'status', 'company_id', 'role_id', 'is_super_admin', 'last_login_at', 'email_verified_at'])]
-#[Hidden(['password', 'remember_token'])]
-
 class User extends Authenticatable implements FilamentUser, HasAvatar
 {
-    use BelongsToTenant, HasApiTokens, HasFactory, HasFileUploads, Notifiable, SoftDeletes;
+    use BelongsToTenant, HasApiTokens, HasFactory, HasFileUploads, IsSystemRecord, Notifiable, SoftDeletes;
 
     protected $table = 'users';
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'phone',
+        'image_path',
+        'status',
+        'company_id',
+        'role_id',
+        'is_super_admin',
+        'last_login_at',
+        'email_verified_at',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     protected function casts(): array
     {
@@ -41,19 +56,28 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         return $this->belongsTo(Role::class);
     }
 
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
-    }
-
     protected function fileUploadFields(): array
     {
         return ['image_path'];
     }
 
-    public function canAccessPanel(Panel $panel): bool
+    public function isActive(): bool
     {
         return $this->status === 'active';
+    }
+
+    public function tenantIsActive(): bool
+    {
+        if ($this->is_super_admin || ! $this->company_id) {
+            return true;
+        }
+
+        return (bool) $this->resolveCompany()?->isActive();
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->isActive() && $this->tenantIsActive();
     }
 
     public function getFilamentAvatarUrl(): ?string
@@ -62,15 +86,19 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             return null;
         }
 
-        $storage = Storage::disk('local');
-        $path = $this->image_path;
-
-        if ($storage->exists($path)) {
-            $filename = basename($path);
-
-            return route('avatars.serve', ['path' => $filename]);
+        if (! Storage::disk($this->fileUploadDisk())->exists($this->image_path)) {
+            return null;
         }
 
-        return null;
+        return route('avatars.serve', ['user' => $this->getKey()]);
+    }
+
+    protected function resolveCompany(): ?Company
+    {
+        if ($this->relationLoaded('company')) {
+            return $this->company;
+        }
+
+        return Company::withoutGlobalScopes()->find($this->company_id);
     }
 }

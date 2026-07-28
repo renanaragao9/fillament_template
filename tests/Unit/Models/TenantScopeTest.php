@@ -116,19 +116,34 @@ class TenantScopeTest extends TestCase
         $this->assertNull(Company::find($this->companyB->id));
     }
 
-    public function test_regular_user_sees_global_permissions_but_not_other_company_custom_permission(): void
+    public function test_permission_catalog_is_global_and_shared_between_tenants(): void
     {
         Permission::create(['name' => 'Global', 'code' => 'global.view', 'group' => 'Global']);
-        Permission::create(['name' => 'Custom B', 'code' => 'custom.b', 'group' => 'Custom', 'company_id' => $this->companyB->id]);
-        Permission::create(['name' => 'Custom A', 'code' => 'custom.a', 'group' => 'Custom', 'company_id' => $this->companyA->id]);
 
         Auth::login($this->userA);
+        $codesA = Permission::pluck('code')->all();
 
-        $codes = Permission::pluck('code')->all();
+        Auth::login($this->userB);
+        $codesB = Permission::pluck('code')->all();
 
-        $this->assertContains('global.view', $codes);
-        $this->assertContains('custom.a', $codes);
-        $this->assertNotContains('custom.b', $codes);
+        $this->assertContains('global.view', $codesA);
+        $this->assertSame($codesA, $codesB);
+    }
+
+    public function test_system_permissions_are_hidden_from_regular_users(): void
+    {
+        Permission::create([
+            'name' => 'Manutenção',
+            'code' => 'system.maintenance',
+            'group' => 'Sistema',
+            'is_super_admin' => true,
+        ]);
+
+        Auth::login($this->userA);
+        $this->assertNotContains('system.maintenance', Permission::pluck('code')->all());
+
+        Auth::login($this->superAdmin);
+        $this->assertContains('system.maintenance', Permission::pluck('code')->all());
     }
 
     public function test_is_super_admin_flagged_records_are_hidden_from_regular_users(): void

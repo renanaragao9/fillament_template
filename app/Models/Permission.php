@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\IsSystemRecord;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Permission extends BaseModel
 {
-    use BelongsToTenant;
+    use IsSystemRecord;
 
     protected $table = 'permissions';
 
@@ -16,8 +15,8 @@ class Permission extends BaseModel
         'name',
         'code',
         'group',
+        'description',
         'is_super_admin',
-        'company_id',
     ];
 
     protected function casts(): array
@@ -27,18 +26,8 @@ class Permission extends BaseModel
         ];
     }
 
-    public function tenantScopeIncludesGlobalRecords(): bool
-    {
-        return true;
-    }
-
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class);
-    }
-
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
     }
 }

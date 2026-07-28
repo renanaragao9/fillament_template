@@ -20,6 +20,11 @@ class PermissionInfolist
                     ->schema([
                         TextEntry::make('name')
                             ->label('Nome'),
+                        TextEntry::make('code')
+                            ->label('Código')
+                            ->badge(),
+                        TextEntry::make('group')
+                            ->label('Grupo'),
                         TextEntry::make('description')
                             ->label('Descrição')
                             ->placeholder('-'),

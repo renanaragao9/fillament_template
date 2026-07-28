@@ -17,3 +17,9 @@
     border-radius: 8px 0 0 8px;
 }
 
+.fi-in-entry-label {
+    border-inline-start: 3px solid var(--primary-400);
+    padding-inline-start: 0.5rem;
+    border-radius: 3px 0 0 3px;
+}
+

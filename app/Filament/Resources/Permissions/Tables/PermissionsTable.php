@@ -19,6 +19,14 @@ class PermissionsTable
                 TextColumn::make('name')
                     ->label('Nome')
                     ->searchable(),
+                TextColumn::make('code')
+                    ->label('Código')
+                    ->badge()
+                    ->searchable(),
+                TextColumn::make('group')
+                    ->label('Grupo')
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('description')
                     ->label('Descrição')
                     ->searchable()

@@ -11,6 +11,7 @@ use Filament\Actions\ViewAction;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class RolesTable
 {
@@ -26,6 +27,11 @@ class RolesTable
                     ->searchable()
                     ->placeholder('-')
                     ->limit(60),
+                TextColumn::make('company.name')
+                    ->label('Empresa')
+                    ->sortable()
+                    ->placeholder('Sem empresa')
+                    ->visible(fn () => (bool) Auth::user()?->is_super_admin),
                 TextColumn::make('created_at')
                     ->label('Criado em')
                     ->dateTime('d/m/Y H:i')

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->string('group');
             $table->text('description')->nullable();
             $table->boolean('is_super_admin')->default(false);
-            $table->foreignId('company_id')->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
 

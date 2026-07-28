@@ -24,6 +24,10 @@ class LoginAuthService
             return null;
         }
 
+        if (! $user->isActive() || ! $user->tenantIsActive()) {
+            return null;
+        }
+
         return $user;
     }
 }

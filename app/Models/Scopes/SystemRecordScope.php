@@ -7,16 +7,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 
-class CurrentCompanyScope implements Scope
+class SystemRecordScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        $tenant = TenantContext::current();
-
-        if (! $tenant->shouldScope()) {
+        if (! TenantContext::current()->shouldScope()) {
             return;
         }
 
-        $builder->where($model->getTable().'.id', $tenant->companyId());
+        $builder->where($model->getTable().'.is_super_admin', false);
     }
 }
